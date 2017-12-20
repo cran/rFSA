@@ -12,4 +12,3 @@ which.max.na(vec)
 \description{
 rFSA function to compute the maximum value from a vector with NA's.
 }
-

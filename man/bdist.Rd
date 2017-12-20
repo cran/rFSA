@@ -14,4 +14,3 @@ bdist(model, name = "B Distance")
 \description{
 rFSA Criterion Function to compute the Bhattacharyya distance.
 }
-

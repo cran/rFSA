@@ -15,4 +15,3 @@ List all included Criteria function for lmFSA and glmFSA.
 \examples{
 list.criterion()
 }
-

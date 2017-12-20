@@ -26,4 +26,3 @@ fit<-lmFSA(formula="mpg~hp*wt",data=mtcars,fixvar="hp",
 predict(fit)
 predict(fit,newdata=mtcars[1:15,])
 }
-

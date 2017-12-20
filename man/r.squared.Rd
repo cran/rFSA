@@ -14,4 +14,3 @@ r.squared(model, name = "R Squared")
 \description{
 rFSA Criterion Function to compute R squared.
 }
-

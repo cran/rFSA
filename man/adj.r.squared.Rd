@@ -14,4 +14,3 @@ adj.r.squared(model, name = "Adj R Squared")
 \description{
 rFSA Criterion Function to compute Adjusted R-Squared.
 }
-

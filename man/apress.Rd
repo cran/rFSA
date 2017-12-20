@@ -14,4 +14,3 @@ apress(model, name = "PRESS")
 \description{
 rFSA Criterion Function to Allen's Press Statistic.
 }
-

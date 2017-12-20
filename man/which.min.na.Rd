@@ -12,4 +12,3 @@ which.min.na(vec)
 \description{
 rFSA function to compute the minimum value from a vector with NA's.
 }
-

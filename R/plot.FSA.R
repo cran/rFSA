@@ -6,7 +6,6 @@
 #' @param ... arguments to be passed to other functions. 
 #' @return diagnostic plots to plot window. 
 #' @importFrom graphics par plot
-#' @importFrom methods show
 #' @importFrom stats AIC anova as.formula cov fitted formula glm influence lm predict resid var
 #' @importFrom utils capture.output tail
 #' @export
@@ -21,10 +20,10 @@
 plot.FSA <- function(x,ask = F,easy = T,...) {
   stopifnot(inherits(x, "FSA"))
   fm <- fitmodels(x)
-  if (length(fm) < 4) {
+  if (length(fm) < 2) {
     dm <- length(fm)
   } else
-    dm <- 4
+    dm <- 2
   if (easy == F) {
     par(mfrow = c(1,4))
   }

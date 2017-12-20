@@ -14,4 +14,3 @@ int.p.val(model, name = "Interaction P-Value")
 \description{
 rFSA Criterion Function to compute Liklihood Ratio Test Statistics p-value for the largest order interation term.
 }
-

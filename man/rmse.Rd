@@ -14,4 +14,3 @@ rmse(model, name = "RMSE")
 \description{
 rFSA Criterion Function to compute Root Mean Squared Error.
 }
-

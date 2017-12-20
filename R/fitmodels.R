@@ -4,7 +4,6 @@
 #' @param ... other parameters passed to lm or glm. See help(lm) or help(glm) for other potential arguements.
 #' @return list of FSA models that have been fitted.
 #' @importFrom graphics par plot
-#' @importFrom methods show
 #' @importFrom stats AIC anova as.formula cov fitted formula glm influence lm predict resid var
 #' @importFrom utils capture.output tail
 #' @export
@@ -18,18 +17,18 @@
 #' fitmodels(fit)
 fitmodels <- function(object,...) {
   stopifnot(inherits(object, "FSA"))
-  resls <- list()
-  one<-capture.output(forms <- print(object))
-  if (is.null(object$call$fam)) {
-    for (i in 1:(dim(object$table)[1] + 1)) {
-      resls[[i]] <- lm(forms$Formula[[i]],data = object$call$data,...)
-    }
+  resls <- c(list(object$original$model), object$table$model)
+  ## one<-capture.output(forms <- print(object))
+  ## if (is.null(object$call$fam)) {
+  ##   for (i in 1:(dim(object$table)[1] + 1)) {
+  ##     resls[[i]] <- lm(forms$Formula[[i]],data = object$call$data,...)
+  ##   }
     
-  } else{
-    for (i in 1:(dim(object$table)[1] + 1)) {
-      resls[[i]] <-
-        glm(forms$Formula[[i]],data = object$call$data,family = object$call$fam,...)
-    }
-  }
+  ## } else{
+  ##   for (i in 1:(dim(object$table)[1] + 1)) {
+  ##     resls[[i]] <-
+  ##       glm(forms$Formula[[i]],data = object$call$data,family = object$call$fam,...)
+  ##   }
+  ## }
   return(resls)
 }

@@ -83,11 +83,19 @@ int.p.val <- function(model,name = "Interaction P-Value") {
 #' @importFrom stats AIC anova as.formula cov fitted formula glm influence lm predict resid var
 #' @importFrom utils capture.output tail
 #' @export
+#' 
+#' @examples
+#' #To use Bhattacharyya Distance and FSA the response must be binary, and you must
+#' #be considering searching for two way continuous interactions. 
+#' data(mtcars)
+#' fit<-FSA(formula = "am~gear*hp",data = mtcars,
+#' fitfunc = glm,family="binomial",m = 2,cores=1,
+#' interactions = TRUE,criterion = bdist,minmax = "max")
 bdist <- function(model,name = "B Distance") {
   if(length(grep(":",names(model$coefficients)))==0){return(0)} #no interaction in model to check
-  if(is.null(model$family)){return(0)} #not logistic regression
+  if(model$family$link!="logit"){return(0)} #not logistic regression
   
-  nam<-c(all.vars(model$formula)[1],strsplit(names(model$coefficients)[grep(":",names(model$coefficients))],"[:]")[[1]])
+  nam<-c(all.vars(as.formula(model$formula))[1],strsplit(names(model$coefficients)[grep(":",names(model$coefficients))],"[:]")[[1]])
   tmp_dat <- eval(model$model)
   y <- tmp_dat[,nam[1]]
   x1 <- tmp_dat[,nam[2]]
@@ -152,28 +160,36 @@ which.min.na <- function(vec) {
   which(vec == minval)
 }
 
-#' List all included Criteria function for lmFSA and glmFSA.
-#'
-#' @return list of functions and whether lmFSA or glmFSA work with those functions.
+#' Return QICu for geepack::geeglm
+#' @description Computes quasi-likelihood under the independence criterion (QICu)
+#' @param gee.obj geeglm obj
 #' @importFrom graphics par plot
 #' @importFrom stats AIC anova as.formula cov fitted formula glm influence lm predict resid var
 #' @importFrom utils capture.output tail
-#' @importFrom methods show
 #' @export
-#'
-#' @examples
-#' list.criterion()
-list.criterion<-function(){
-  show("Accepted Criteria Functions for lmFSA and glmFSA")
-  show("")
-  tab<-rbind(c("r.squared","lmFSA"),c("adj.r.squared","lmFSA"),c("AIC","lmFSA; glmFSA"),c("BIC","lmFSA; glmFSA"),
-        c("rmse","lmFSA; glmFSA"),c("apress","lmFSA; glmFSA"),c("int.p.val","lmFSA; glmFSA"),
-        c("bdist","glmFSA (only 2 way interactions)"))
-  colnames(tab)<-c('Criterion',"Accepted in")
-  tab<-data.frame(tab)
-  show(tab)
-  show("")
-  show("You can write your own criterion function too! Or use other criterion functions from other packages. Just follow the standard format used in int.p.val or apress as an example.")
+QICu.geeglm = function(gee.obj){ 
+  tryCatch(expr = {
+    if(is.null(gee.obj) || is.na(gee.obj)){ return(NA) }
+    
+    Y.hat = gee.obj$fitted.values
+    Y = gee.obj$y
+    p = gee.obj$rank  # number of parameters
+    fam = gee.obj$family$family  # family
+    
+    # quasi-Likelihood (calculation depends on family)
+    qL = switch(fam,
+                binomial = sum(Y * log(Y.hat / (1-Y.hat)) + log(1 - Y.hat)),
+                gaussian = sum(-0.5 * (Y - Y.hat)**2),
+                Gamma = sum(-Y/Y.hat - log(Y.hat)),
+                inverse.gaussian = sum(-0.5 * (Y / (Y.hat**2)) + 1/Y.hat),
+                poisson = sum(Y * log(Y.hat) - Y.hat), 
+                NA)  # default action
+    #qL = sum(Y * log(Y.hat / (1-Y.hat)) + log(1 - Y.hat))  # binomial quasi-Likelihood
+    
+    return(-2*qL + 2*p)  # QICu
+  },
+  error = function(e){ print(e); return(NA) } )
 }
+
 
 

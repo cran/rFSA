@@ -45,8 +45,8 @@ FSA <- function(formula, data, fitfunc=lm, fixvar = NULL, quad = FALSE,
   call <- match.call()
   original <- list()
   original$formula <- Reduce(paste, deparse(as.formula(formula)))
-  original$model <- fitfunc(formula=original$formula, data=data,...)
-  original$model <- tryCatch(fitfunc(formula=original$formula, data=data, ...),
+  #original$model <- fitfunc(formula=original$formula, data=data,...)
+  original$model <- tryCatch(fitfunc(formula=as.formula(original$formula), data=data, ...),
                              error=function(e){
                                warning("failed to fit the original model specified by formula")
                                NULL})
@@ -98,7 +98,7 @@ FSA <- function(formula, data, fitfunc=lm, fixvar = NULL, quad = FALSE,
       if (length(idx)==0) {
         tmp <- table.0[n,]
         for (l in 1:length(criterion)) {
-          tmp[[paste0("criterion.",l)]] <- criterion[[l]](fitfunc(tmp$formula, data=data, ...))
+          tmp[[paste0("criterion.",l)]] <- criterion[[l]](fitfunc(as.formula(tmp$formula), data=data, ...))
         }
         tmp$opt.criterion <- list(k)
         table <- rbind(table, tmp)
@@ -451,7 +451,7 @@ fitFSA <- function(formula, data, fitfunc=lm, fixvar = NULL, quad = FALSE,
     table$model <- MDL[sln.keys]
   } else {
     table$model <- lapply(table$formula, FUN = function(form) {
-      fitfunc(form, data=data, ...)
+      fitfunc(as.formula(form), data=data, ...)
     })
   }
 

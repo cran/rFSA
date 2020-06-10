@@ -160,6 +160,30 @@ which.min.na <- function(vec) {
   which(vec == minval)
 }
 
+#' List all included Criteria function for lmFSA and glmFSA.
+#'
+#' @return list of functions and whether lmFSA or glmFSA work with those functions.
+#' @importFrom graphics par plot
+#' @importFrom stats AIC anova as.formula cov fitted formula glm influence lm predict resid var
+#' @importFrom utils capture.output tail
+#' @importFrom methods show
+#' @export
+#'
+#' @examples
+#' list.criterion()
+list.criterion<-function(){
+  show("Accepted Criteria Functions for lmFSA and glmFSA")
+  show("")
+  tab<-rbind(c("r.squared","lmFSA"),c("adj.r.squared","lmFSA"),c("AIC","lmFSA; glmFSA"),c("BIC","lmFSA; glmFSA"),
+        c("rmse","lmFSA; glmFSA"),c("apress","lmFSA; glmFSA"),c("int.p.val","lmFSA; glmFSA"),
+        c("bdist","glmFSA (only 2 way interactions)"))
+  colnames(tab)<-c('Criterion',"Accepted in")
+  tab<-data.frame(tab)
+  show(tab)
+  show("")
+  show("You can write your own criterion function too! Or use other criterion functions from other packages. Just follow the standard format used in int.p.val or apress as an example.")
+}
+
 #' Return QICu for geepack::geeglm
 #' @description Computes quasi-likelihood under the independence criterion (QICu)
 #' @param gee.obj geeglm obj
@@ -191,5 +215,15 @@ QICu.geeglm = function(gee.obj){
   error = function(e){ print(e); return(NA) } )
 }
 
+#' Return maximum absolute residual from a model
+#' @description Return maximum absolute residual from a model
+#' @param model  model obj
+#' @importFrom graphics par plot
+#' @importFrom stats AIC anova as.formula cov fitted formula glm influence lm predict resid var
+#' @importFrom utils capture.output tail 
+#' @export
+max_abs_resid<-function(model){
+  return(min(abs(summary(object = model)$residuals)))
+}
 
 

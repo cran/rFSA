@@ -1,26 +1,11 @@
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/rFSA)](https://cran.r-project.org/package=rFSA)
+[![Downloads](http://cranlogs.r-pkg.org/badges/rFSA)](http://cranlogs.r-pkg.org/badges/rFSA)
+[![Total Downloads](http://cranlogs.r-pkg.org/badges/grand-total/rFSA)](http://cranlogs.r-pkg.org/badges/grand-total/rFSA)
+
 # Overview
-This R package utilizes an exchange algorithm to find best higher order interactions, and best subsets in statistical models. The algorithm searches the data space for models of a specified form that are statistically optimal. Many replications of this algorithm will produce a set of `feasible solutions', which the researcher can investigate. The algorithm can help improve existing models used in bioinformatics, health care, or other fields which have yet to explore quadratic terms, interactions, or a higher order of predictors because of the size of their datasets. The package, rFSA, is flexible to many different statistical methods and criteria functions. Statistical methods in R that have a formula, and data command can be used by rFSA to search for interactions or best subsets. Users can use common criterion functions (R squared, AIC, PRESS, ... ) or write their own [See Guide](http://www.shinyfsa.org)
+Our article ["rFSA: An R Package for Finding Best Subsets and Interactions"](https://journal.r-project.org/archive/2018/RJ-2018-059/index.html) was published in the R Journal in December 2018. The article outlines The Feasible Solution Algorithm (FSA) and the R package rFSA.
 
-# The FSA Algorithm
-Statisticians are often faced with the problem of identifying a subset of k explanatory variables from p variables Xp, including interactions and quadratic terms. Consider fixing p+ explanatory variables in a preliminary model. Denote these variables Xp+. Let m(Y;Xp+) be an objective function that can be a measure of model quality i.e., R2; AIC; BIC; etc. We
-wish to find the k additional variables denoted Xk to add to the model that optimizes the objective function m(Y;Xp+;Xk).
-
-The Feasible Solution Algorithm (FSA) addresses this problem in the following way:
-1. Choose Xk randomly and compute the objective function m.
-2. Consider exchanging one of the k selected variables from the current model
-3. Make the single exchange that improves the objective function m the most.
-4. Keep making exchanges until the objective function does not improve. These variables Xp+;Xk are called a feasible solution.
-5. Return to (1) to find another feasible solution.
-
-In another instance of the FSA, we include the jth order interaction and lower order terms we are considering in step 1. We then continue on to step 2, only this time when we make an exchange it changes the jth order interaction and the lower interactions and main effects as well. We could then optimize based on a model criterion or on an interaction terms p-value.
-
-A single iteration of FSA yields a feasible solution in the sense that it may globally optimize m(Y;X). Of course, the algorithm may converge somewhere other than the global optimum. Using the algorithm multiple times identifies multiple feasible solutions, the best of which may be the global optimum.
-
-Miller (1984) outlines the FSA described above in the following way. Suppose we have 26 predictor variables labeled A through Z. Imagine you wish to find the best subset with four predictor variables. First start randomly with four predictors. Suppose these are ABCD. Consider changing one of A, B, C, or D with one of the other 22 remaining variables. Make the change that improves the objective function the most. Suppose we swap C for X. Now we have ABXD. Next consider changing one of A, B, X, or D (Considering X here is redundant and not necessary). This process is repeated until no further improvements, to the objective function, can be made.
-
-This method, coupled with repeating it for different random starts, can give different solutions which could be interesting from a clinical or scientific viewpoint. These unique feasible solutions are optimal for the criterion function that was chosen by the user in that no one exchange of any one variable can improve the criterion function.
-
-# The R package rFSA
+# rFSA
 To use the R package, rFSA, the user must know how they wish to model the data (method) and how the will evaluate the fit of the models that will be checked (criterion function). 
 ## Example (mtcars)
 In R, a commond test dataset to analyze is `mtcars`. For this example we will use multiple linear regression to fit the model and Adjusted R Squared to asses the model fit on the response(Miles Per Gallon).
@@ -32,7 +17,7 @@ For this example, let us assume that we have already found that the weight(wt) a
 
 To do this with rFSA, we could run the following code:
 ```R
-install.packages(rFSA) #or install_github("joshuawlambert/rFSA")
+install.packages(rFSA) #or devtools::install_github("joshuawlambert/rFSA")
 library(rFSA)
 data(mtcars)
 
@@ -58,7 +43,7 @@ plot(fsaFit) #plots diagnostic plots for all models found by FSA
 fitted(fsaFit) #fitted values from all models found by FSA
 predict(fsaFit) #predicted values from all models found by FSA, can also add newdata command.
 ```
-As we can see from `print(fsaFit)`, from the 10 random starts there were 2 feasible solutions (FS). The two feasible included an interaction between hp*wt and drat*carb.  Each of these FS happened 9 and 1 respectively. After looking at `summary(fsaFit)` we can see that hp*wt is statistically significant (p-value<0.01) and drat*carb is marginally significant (p-value ~= 0.06). If we wished to find interactions that were significant, we could change `criterion=int.p.val` and `minmax = "min"`. Do so, will yeild one FS: hp*wt.
+As we can see from `print(fsaFit)`, from the 10 random starts there were 2 feasible solutions (FS). The two feasible included an interaction between hp*wt and drat*carb.  Each of these FS happened 9 and 1 respectively. After looking at `summary(fsaFit)` we can see that hp and wt interaction is statistically significant (p-value<0.01) and drat and carb interaction is marginally significant (p-value ~= 0.06). If we wished to find interactions that were significant, we could change `criterion=int.p.val` and `minmax = "min"`. Doing so, will yeild one FS: hp*wt.
 
 Following up these results with sufficient checks into model fit and diagnositic plots is . 
 
@@ -72,4 +57,20 @@ var4int = NULL #Variable to fix in interaction. Useful when considering 3 or mor
 min.nonmissing = 1 #Don't consider models that have less than or equal to this number of observations
 return.models = FALSE #should all models that are checked be returned? Useful when you want to ploc criterion history.
 ```
-see `help(rFSA)' for more details.
+see `help(FSA)' for more details.
+
+## Visualizing Interactions
+Visualizing interactions can be quite difficult depending on the types of variables that are involved in the relationship. The goal of *rFSA* is not to assist the user in visualizing the interaction, but the authors recognize that visual tools are often quite useful conveying the results from a statistical model. 
+
+We have found the *sjPlot* package to be very useful for plotting 2-way interactions. More information about the *sjPlot* package can be found here: http://www.strengejacke.de/sjPlot/. 
+
+For the mtcars example above, the two interactions that were found can be plotted very easy using the *sjPlot* function *plot_model* with the *type="int"* option. Below is some example code:
+```R
+library(sjPlot)
+library(rFSA)
+fit<-rFSA::fitmodels(fsaFit)
+sjPlot::plot_model(fit[[2]],type = "int")
+sjPlot::plot_model(fit[[3]],type = "int")
+```
+![Feasible solution 1](https://github.com/joshuawlambert/Presentations/blob/master/FS1.png)
+![Feasible solution 2](https://github.com/joshuawlambert/Presentations/blob/master/FS2.png)
